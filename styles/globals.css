@@ -43,3 +43,65 @@
  html{
   background-color: aliceblue;
  }
+
+ .file-upload-container {
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   background-color: #f5f5f5;
+   padding: 20px;
+   border-radius: 8px;
+   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+ }
+
+ .file-upload-label {
+   display: flex;
+   align-items: center;
+   cursor: pointer;
+   font-size: 16px;
+   color: #666;
+   transition: color 0.3s ease;
+   width: 100%;
+ }
+
+ .file-upload-label i {
+   margin-right: 8px;
+   font-size: 24px;
+ }
+
+ .file-upload-label:hover {
+   color: #333;
+ }
+
+ .file-name {
+   overflow: hidden;
+   text-overflow: ellipsis;
+   white-space: nowrap;
+   flex-grow: 1;
+ }
+
+ .file-upload-input {
+   position: absolute;
+   width: 1px;
+   height: 1px;
+   padding: 0;
+   margin: -1px;
+   overflow: hidden;
+   clip: rect(0, 0, 0, 0);
+   border: 0;
+ }
+
+ .file-upload-button {
+   background-color: #007bff;
+   color: #fff;
+   border: none;
+   border-radius: 4px;
+   padding: 10px 20px;
+   font-size: 16px;
+   cursor: pointer;
+   transition: background-color 0.3s ease;
+ }
+
+ .file-upload-button:hover {
+   background-color: #0056b3;
+ }

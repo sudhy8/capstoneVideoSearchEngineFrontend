@@ -171,7 +171,7 @@ export default function ReviewCard(data) {
         setExpanded(!expanded);
     };
 
- 
+
     function convertTimeToSeconds(timeString) {
         const [hours, minutes, seconds] = timeString.split(':');
         const secondsWithMilliseconds = seconds.split('.');
@@ -186,7 +186,7 @@ export default function ReviewCard(data) {
 
     return (
         <>
-            
+
             <Modal
                 aria-labelledby="unstyled-modal-title"
                 aria-describedby="unstyled-modal-description"
@@ -197,9 +197,9 @@ export default function ReviewCard(data) {
                 <ModalContent sx={{ width: "90vw", height: "80vh" }}>
                     <Grid container>
                         <Grid item xs={12}>
-                            <Typography variant='p'>
+                            <p style={{padding:"10px 10px 10px 0px",fontSize:"20px"}}>
                                 {data?.data?.scenes[0]?.video_name}
-                            </Typography>
+                            </p>
                         </Grid>
                         <Grid item xs={9}>
                             {/* <video width="100%" controls>
@@ -209,7 +209,7 @@ export default function ReviewCard(data) {
                             <ReactPlayer
                                 url={`https://invideosearchbucket.s3.us-west-2.amazonaws.com/${data?.data?.video_path}`}
                                 width="100%"
-                                height="100%"
+                                height="calc(100% - 100px)"
                                 controls
                                 ref={playerRef}
                                 onProgress={(progress) => setCurrentTime(progress.playedSeconds)}
@@ -217,33 +217,43 @@ export default function ReviewCard(data) {
                             />
                         </Grid>
                         <Grid item xs={3} style={{
-                            padding: "0px 15px", height: "80vh",
-                            overflow: "auto"
-}}>
+                            padding: "0px 15px", height: "calc(80vh - 100px)",
+                            overflow: "auto", background:"#e8f4ff"
+                        }}>
                             {
                                 data?.data?.scenes?.map(scn => (
 
-                                    <Grid container style={{padding:"5px"}}>
+                                    <Grid container style={{ padding: "5px", background:'#bde0ff',padding:"10px 10px",margin:'10px 0px' }}>
                                         <Grid item xs={12} container>
                                             <Grid item xs={12}>
-                                                <img onClick={() => handleJumpToTime(convertTimeToSeconds(scn?.start_time))} style={{ width: "150px" }} src={`https://invideosearchbucket.s3.us-west-2.amazonaws.com/${scn?.frame_file}`} />
+                                                <img onClick={() => handleJumpToTime(convertTimeToSeconds(scn?.start_time))} style={{  }} src={`https://invideosearchbucket.s3.us-west-2.amazonaws.com/${scn?.frame_file}`} />
 
                                             </Grid>
                                             <Grid item xs={12}>
-                                                {
-                                                    scn?.scene_number
-                                                }
+                                                <p>Scene: 
+                                                    {
+                                                        scn?.scene_number
+                                                    }
+                                                </p> 
                                             </Grid>
                                             <Grid item xs={12}>
-                                                {
-                                                    scn?.start_time
-                                                }
+                                                <p>
+                                                    From - To
+                                                </p>
+
                                             </Grid>
                                             <Grid item xs={12}>
-                                                {
-                                                    scn?.end_time
-                                                }
+                                                <p>
+                                                    {
+                                                        scn?.start_time.slice(0, -4)
+                                                    } - ‎    
+                                                    {
+                                                        scn?.end_time.slice(0, -4)
+                                                    }
+                                                </p>
+                                                
                                             </Grid>
+                                            
 
                                         </Grid>
 
@@ -256,35 +266,59 @@ export default function ReviewCard(data) {
             </Modal>
 
 
-        <Card style={{padding:"15px"}}>
-            
-            <video width="100%" controls>
-                <source src={`https://invideosearchbucket.s3.us-west-2.amazonaws.com/${data?.data?.video_path}`} type="video/mp4" />
-            </video>
-            <CardContent>
-                <Typography variant="body2" color="text.secondary">
+            <Card style={{ padding: "15px", height: "100%",position:"relative" }}>
+
+                <video width="100%" controls style={{ borderRadius: '5px' }}>
+                    <source src={`https://invideosearchbucket.s3.us-west-2.amazonaws.com/${data?.data?.video_path}`} type="video/mp4" />
+                </video>
+                <CardContent style={{padding:"16px 16px 5px 16px"}}>
+                    <p style={{
+                        padding: "10px 0px 5px 0px", whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis"
+                    }} variant="body2" color="text.secondary">
                         {data?.data?.scenes[0]?.video_name}
 
-                </Typography>
-            </CardContent>
-            <CardActions disableSpacing>
-                    <IconButton aria-label="share" onClick={handleOpen}>
+                    </p>
+                    <hr />
+                    <p style={{paddingTop:"10px"}}>
+                        Scens : {data?.data?.scenes?.length}
+                    </p>
+                </CardContent>
+                <CardActions disableSpacing style={{
+                    position: "absolute",
+                    bottom: "10px",
+                    right: "12px"
+                }}>
+                    {/* <IconButton aria-label="share" onClick={handleOpen}>
                         <ViewSidebarRoundedIcon />
-                    </IconButton>
+                    </IconButton> */}
 
-                    
-                <ExpandMore
+
+                    {/* <ExpandMore
                     expand={expanded}
                     onClick={handleExpandClick}
                     aria-expanded={expanded}
                     aria-label="show more"
                 >
                     <ExpandMoreIcon />
-                    </ExpandMore>
-                    
+                    </ExpandMore> */}
 
-            </CardActions>
-            <Collapse in={expanded} timeout="auto" unmountOnExit>
+                    <ExpandMore
+                        expand={expanded}
+                        onClick={handleOpen}
+                        aria-expanded={expanded}
+                        aria-label="show more"
+                        style={{padding:"0px"}}
+                       
+                    >
+                        <ViewSidebarRoundedIcon />
+
+                    </ExpandMore>
+
+
+                </CardActions>
+                {/* <Collapse in={expanded} timeout="auto" unmountOnExit>
                 <CardContent>
 
                     {
@@ -301,9 +335,9 @@ export default function ReviewCard(data) {
                     </p>
                     
                 </CardContent>
-            </Collapse>
+            </Collapse> */}
             </Card>
-            </>
+        </>
     );
 }
 

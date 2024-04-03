@@ -116,9 +116,55 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 export default function SearchAppBar() {
   const [open, setOpen] = React.useState(false);
+  const [success, setSuccess] = React.useState(false);
+
   const handleClose = () => setOpen(false);
   const handleOpen = () => setOpen(true);
 
+
+  const [file, setFile] = useState(null);
+  const [status, setStatus] = useState(false);
+
+
+  const handleSubmit = async (event) => {
+    event.preventDefault(); // Prevent default form submission
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      setStatus(true)
+      const response = await fetch('http://127.0.0.1:5000/videoSplitter', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (response.ok) {
+        // Handle successful response
+        console.log('Video uploaded successfully');
+      } else {
+        // Handle error response
+        console.error('Error uploading video');
+      }
+    } catch (error) {
+      // Handle network or other errors
+      console.error('Error:', error);
+    }
+    setStatus(false)
+    setSuccess(true)
+    setTimeout(() => { 
+      setSuccess(false)
+
+
+     }, 4000);
+    handleClose()
+
+  };
+
+
+  const handleFileChange = (event) => {
+    setFile(event.target.files[0]);
+  };
   return (
     <Box sx={{ flexGrow: 1 }}>
       <style jsx global>{`
@@ -183,23 +229,95 @@ export default function SearchAppBar() {
         onClose={handleClose}
         slots={{ backdrop: StyledBackdrop }}
       >
-        <ModalContent sx={{ width: "90vw", height: "auto" }}>
+        {
+          !success ?
+            <ModalContent sx={{ width: "90vw", height: "auto" }}>
           <Grid container>
             <Grid item style={{ margin: "20px", padding: "20px", borderRadius: '10px', border: "dashed 1px blue", width: "100%" }}>
-              <form action="http://127.0.0.1:5000/videoSplitter" method="post" enctype="multipart/form-data" style={{
+              {/* <form action="http://127.0.0.1:5000/videoSplitter" method="post" enctype="multipart/form-data" style={{
                 display: "flex",
                 flexDirection: "row",
                 flexWrap: "wrap",
                 justifyContent: " space-between"
               }}>
-                <input type="file" name="file" id="upload" hidden />
-                <label for="upload">Choose file</label>
-                <input type="submit" value="Upload" />
+                <input type="file" name="file" id="upload" style={{
+                  width: "100%",
+                  margin: "10px 0px",
+                  padding: "10px",
+                  background: "#001cff17"
+                }} />
+                
+                <div style={{ width: "100%", display: "flex", justifyContent:"flex-end"}}>
+                  <input type="submit" value="Upload" style={{ padding: "8px 30px", backgroundColor:"#001cff",color:"white",cursor:"pointer"}} />
+
+                </div>
+              </form> */}
+
+              <form onSubmit={handleSubmit} style={{
+                display: 'flex',
+                flexDirection: 'row',
+                flexWrap: 'wrap',
+                justifyContent: 'space-between',
+              }}>
+
+                
+                <input
+                  type="file"
+                  name="file"
+                  id="upload"
+                  onChange={handleFileChange}
+                  style={{
+                    width: '100%',
+                    margin: '10px 0px',
+                    padding: '10px',
+                    background: '#001cff17',
+                  }}
+                />
+
+
+                <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-end' }}>
+                  
+                  {
+                    status ? 
+                      <img style={{ width: "40px" }} src="https://invideosearchbucket.s3.us-west-2.amazonaws.com/loader2.gif"/>
+                    :
+                      <button
+                        type="submit"
+                        style={{
+                          padding: '8px 30px',
+                          backgroundColor: '#001cff',
+                          color: 'white',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        Upload
+                      </button>
+}
+                  
+
+
+                </div>
               </form>
+
+
             </Grid>
 
           </Grid>
-        </ModalContent>
+        </ModalContent>:
+            
+            <ModalContent sx={{ width: "50vw", height: "auto" }}>
+              <div style={{width:"100%",textAlign:"center",display: "flex",
+    justifyContent: "center",
+    alignItems: "center"}}>
+                <img style={{ width: "300px" }} src="https://cdn.dribbble.com/users/147386/screenshots/5315437/success-tick-dribbble.gif" />
+
+              </div>
+
+            </ModalContent>
+
+        }
+        
+
       </Modal>
 
 
