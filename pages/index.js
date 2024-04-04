@@ -183,6 +183,8 @@ export default function SearchAppBar() {
 
   const handleSearch = async () => {
     console.log('Searching for:', searchTerm);
+    setResult([])
+
     try {
       const response = await axios.get(`http://127.0.0.1:5000/search/${encodeURIComponent(searchTerm)}`);
       console.log(response?.data)
