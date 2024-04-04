@@ -201,7 +201,11 @@ export default function ReviewCard(data) {
                                 {data?.data?.scenes[0]?.video_name}
                             </p>
                         </Grid>
-                        <Grid item xs={9}>
+                        <Grid item xs={9} style={{
+                            display: "flex",
+                            alignContent: "center",
+                        justifyContent: "center"
+                        }}>
                             {/* <video width="100%" controls>
                                 <source src={`https://invideosearchbucket.s3.us-west-2.amazonaws.com/${data?.data?.video_path}`} type="video/mp4" />
                             </video> */}
@@ -211,6 +215,7 @@ export default function ReviewCard(data) {
                                 width="100%"
                                 height="calc(100% - 100px)"
                                 controls
+                                style={{borderRadius:"15px"}}
                                 ref={playerRef}
                                 onProgress={(progress) => setCurrentTime(progress.playedSeconds)}
 
@@ -223,7 +228,7 @@ export default function ReviewCard(data) {
                             {
                                 data?.data?.scenes?.map(scn => (
 
-                                    <Grid container style={{ padding: "5px", background:'#bde0ff',padding:"10px 10px",margin:'10px 0px' }}>
+                                    <Grid key={scn?.scene_number} container style={{ padding: "5px", background:'#bde0ff',padding:"10px 10px",margin:'10px 0px' }}>
                                         <Grid item xs={12} container>
                                             <Grid item xs={12}>
                                                 <img onClick={() => handleJumpToTime(convertTimeToSeconds(scn?.start_time))} style={{  }} src={`https://invideosearchbucket.s3.us-west-2.amazonaws.com/${scn?.frame_file}`} />

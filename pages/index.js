@@ -13,6 +13,8 @@ import { Grid } from '@mui/material';
 import Button from '@mui/material/Button';
 import CloudUploadRoundedIcon from '@mui/icons-material/CloudUploadRounded';
 import { useState, useRef } from 'react';
+// import { SearchRoundedIcon, SearchOutlinedIcon } from '@material-ui/icons-material';
+import axios from 'axios';
 
 
 import PropTypes from 'prop-types';
@@ -98,10 +100,10 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   fontFamily: 'poppins',
   width: '100%',
   '& .MuiInputBase-input': {
-    padding: theme.spacing(1, 1, 1, 0),
-    border: "solid 2px black",
+    padding: theme.spacing(1, 1, 1, 1),
+    border: "solid 2px #dadaff",
     // vertical padding + font size from searchIcon
-    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
+    // paddingLeft: `calc(1em + ${theme.spacing(4)})`,
     transition: theme.transitions.create('width'),
     [theme.breakpoints.up('sm')]: {
       maxWidth: '200px',
@@ -124,7 +126,8 @@ export default function SearchAppBar() {
 
   const [file, setFile] = useState(null);
   const [status, setStatus] = useState(false);
-
+  const [searchTerm, setSearchTerm] = useState('');
+  const [result, setResult] = useState([]);
 
   const handleSubmit = async (event) => {
     event.preventDefault(); // Prevent default form submission
@@ -152,11 +155,11 @@ export default function SearchAppBar() {
     }
     setStatus(false)
     setSuccess(true)
-    setTimeout(() => { 
+    setTimeout(() => {
       setSuccess(false)
 
 
-     }, 4000);
+    }, 4000);
     handleClose()
 
   };
@@ -165,6 +168,32 @@ export default function SearchAppBar() {
   const handleFileChange = (event) => {
     setFile(event.target.files[0]);
   };
+
+
+
+
+  const handleInputChange = (event) => {
+    setSearchTerm(event.target.value);
+  };
+
+  const SearchButton = styled(Button)(({ theme }) => ({
+    height: '100%',
+    marginLeft: theme.spacing(2),
+  }));
+
+  const handleSearch = async () => {
+    console.log('Searching for:', searchTerm);
+    try {
+      const response = await axios.get(`http://127.0.0.1:5000/search/${encodeURIComponent(searchTerm)}`);
+      console.log(response?.data)
+      setResult(response?.data)
+    } catch (error) {
+      console.error('Error fetching search results:', error);
+    }
+
+  };
+
+
   return (
     <Box sx={{ flexGrow: 1 }}>
       <style jsx global>{`
@@ -195,7 +224,7 @@ export default function SearchAppBar() {
             </Grid>
             <Grid style={{ width: "auto" }} item container>
               <Grid item>
-                <Search>
+                {/* <Search>
                   <SearchIconWrapper>
                     <SearchRoundedIcon style={{ color: 'black' }} />
                   </SearchIconWrapper>
@@ -203,6 +232,29 @@ export default function SearchAppBar() {
                     placeholder="Search…"
                     inputProps={{ 'aria-label': 'search' }}
                   />
+                </Search> */}
+                <Search>
+
+
+                  <StyledInputBase
+                    placeholder="Search…"
+                    inputProps={{ 'aria-label': 'search' }}
+                    value={searchTerm}
+                    onChange={handleInputChange}
+                  />
+                  {/* <SearchButton variant="contained" color="primary" onClick={handleSearch}>
+                    <SearchRoundedIcon />
+                  </SearchButton> */}
+                  <SearchButton variant="contained" onClick={handleSearch} style={{
+                    height: "40px",
+                    right: "0px",
+                    position: "absolute"
+                  }}>
+                    <SearchIconWrapper >
+                      <SearchRoundedIcon style={{ color: 'black' }} />
+                    </SearchIconWrapper>
+                  </SearchButton>
+
                 </Search>
               </Grid>
               <Grid item style={{
@@ -232,9 +284,9 @@ export default function SearchAppBar() {
         {
           !success ?
             <ModalContent sx={{ width: "90vw", height: "auto" }}>
-          <Grid container>
-            <Grid item style={{ margin: "20px", padding: "20px", borderRadius: '10px', border: "dashed 1px blue", width: "100%" }}>
-              {/* <form action="http://127.0.0.1:5000/videoSplitter" method="post" enctype="multipart/form-data" style={{
+              <Grid container>
+                <Grid item style={{ margin: "20px", padding: "20px", borderRadius: '10px', border: "dashed 1px blue", width: "100%" }}>
+                  {/* <form action="http://127.0.0.1:5000/videoSplitter" method="post" enctype="multipart/form-data" style={{
                 display: "flex",
                 flexDirection: "row",
                 flexWrap: "wrap",
@@ -253,62 +305,64 @@ export default function SearchAppBar() {
                 </div>
               </form> */}
 
-              <form onSubmit={handleSubmit} style={{
-                display: 'flex',
-                flexDirection: 'row',
-                flexWrap: 'wrap',
-                justifyContent: 'space-between',
-              }}>
-
-                
-                <input
-                  type="file"
-                  name="file"
-                  id="upload"
-                  onChange={handleFileChange}
-                  style={{
-                    width: '100%',
-                    margin: '10px 0px',
-                    padding: '10px',
-                    background: '#001cff17',
-                  }}
-                />
+                  <form onSubmit={handleSubmit} style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    flexWrap: 'wrap',
+                    justifyContent: 'space-between',
+                  }}>
 
 
-                <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-end' }}>
-                  
-                  {
-                    status ? 
-                      <img style={{ width: "40px" }} src="https://invideosearchbucket.s3.us-west-2.amazonaws.com/loader2.gif"/>
-                    :
-                      <button
-                        type="submit"
-                        style={{
-                          padding: '8px 30px',
-                          backgroundColor: '#001cff',
-                          color: 'white',
-                          cursor: 'pointer',
-                        }}
-                      >
-                        Upload
-                      </button>
-}
-                  
+                    <input
+                      type="file"
+                      name="file"
+                      id="upload"
+                      onChange={handleFileChange}
+                      style={{
+                        width: '100%',
+                        margin: '10px 0px',
+                        padding: '10px',
+                        background: '#001cff17',
+                      }}
+                    />
 
 
-                </div>
-              </form>
+                    <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-end' }}>
+
+                      {
+                        status ?
+                          <img style={{ width: "40px" }} src="https://invideosearchbucket.s3.us-west-2.amazonaws.com/loader2.gif" />
+                          :
+                          <button
+                            type="submit"
+                            style={{
+                              padding: '8px 30px',
+                              backgroundColor: '#001cff',
+                              color: 'white',
+                              cursor: 'pointer',
+                            }}
+                          >
+                            Upload
+                          </button>
+                      }
 
 
-            </Grid>
 
-          </Grid>
-        </ModalContent>:
-            
+                    </div>
+                  </form>
+
+
+                </Grid>
+
+              </Grid>
+            </ModalContent> :
+
             <ModalContent sx={{ width: "50vw", height: "auto" }}>
-              <div style={{width:"100%",textAlign:"center",display: "flex",
-    justifyContent: "center",
-    alignItems: "center"}}>
+              <div style={{
+                width: "100%", textAlign: "center", display: "flex",
+                justifyContent: "center",
+                alignItems: "center"
+              }}>
                 <img style={{ width: "300px" }} src="https://cdn.dribbble.com/users/147386/screenshots/5315437/success-tick-dribbble.gif" />
 
               </div>
@@ -316,7 +370,7 @@ export default function SearchAppBar() {
             </ModalContent>
 
         }
-        
+
 
       </Modal>
 
@@ -325,8 +379,11 @@ export default function SearchAppBar() {
 
 
 
+        {
+          result.length > 0 ?
+            <SearchResult out={result} /> : <p>Search</p>
+        }
 
-        <SearchResult />
       </div>
     </Box>
   );
