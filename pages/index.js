@@ -15,13 +15,17 @@ import CloudUploadRoundedIcon from '@mui/icons-material/CloudUploadRounded';
 import { useState, useRef } from 'react';
 // import { SearchRoundedIcon, SearchOutlinedIcon } from '@material-ui/icons-material';
 import axios from 'axios';
+import { useEffect } from 'react';
+import Skeleton from '@mui/material/Skeleton';
 
 
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
 import { css } from '@mui/system';
 import { Modal as BaseModal } from '@mui/base/Modal';
-
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import CardActions from '@mui/material/CardActions';
 
 import ReactPlayer from 'react-player';
 
@@ -123,17 +127,66 @@ export default function SearchAppBar() {
   const handleClose = () => setOpen(false);
   const handleOpen = () => setOpen(true);
 
-
+  
   const [file, setFile] = useState(null);
   const [status, setStatus] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [result, setResult] = useState([]);
+
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [latestVideos, setLatestVideos] = useState([]);
+
+
+
+  const resetAll = () => {
+    setSuccess(false)
+    setStatus(false)
+    handleOpen()
+  }
+
+  useEffect(() => {
+    getLatest()
+  }, [])
+
+  const getLatest = async () => {
+
+    try {
+      setInitialLoading(true)
+      // alert("Hello")
+
+      fetch('http://127.0.0.1:5000/latestVideos')
+        .then(response => response.json())
+        .then(data => {
+          // The data variable now contains the JSON response
+          console.log(data);
+          setTimeout(function () {
+            console.log("Waiting");
+            setLatestVideos(data)
+            setInitialLoading(false)
+
+
+          }, 2000);
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+
+
+    }
+    catch (error) {
+      console.error('Error:', error);
+
+    }
+  }
 
   const handleSubmit = async (event) => {
     event.preventDefault(); // Prevent default form submission
 
     const formData = new FormData();
     formData.append('file', file);
+
+
+    // http://127.0.0.1:5000/latestVideos
 
     try {
       setStatus(true)
@@ -155,12 +208,8 @@ export default function SearchAppBar() {
     }
     setStatus(false)
     setSuccess(true)
-    setTimeout(() => {
-      setSuccess(false)
-
-
-    }, 4000);
-    handleClose()
+    
+    // handleClose()
 
   };
 
@@ -194,6 +243,20 @@ export default function SearchAppBar() {
     }
 
   };
+
+  function extractName(str) {
+    // Split the string by the '.' character
+    const parts = str.split('.');
+
+    // Get the name part by joining the parts from the second index onwards
+    const name = parts.slice(1).join('.');
+
+    // Get the file extension
+    const fileExtension = parts[parts.length - 1];
+
+    // Return the name and file extension
+    return `${name.slice(7)}`;
+  }
 
 
   return (
@@ -262,7 +325,7 @@ export default function SearchAppBar() {
               <Grid item style={{
                 padding: "3px 13px"
               }}>
-                <Button variant="outlined" style={{ color: "#1D2FE1" }} onClick={handleOpen} startIcon={<CloudUploadRoundedIcon />}>
+                <Button variant="outlined" style={{ color: "#1D2FE1" }} onClick={resetAll} startIcon={<CloudUploadRoundedIcon />}>
                   Upload
                 </Button>
               </Grid>
@@ -383,7 +446,57 @@ export default function SearchAppBar() {
 
         {
           result.length > 0 ?
-            <SearchResult out={result} /> : <p>Search</p>
+            <SearchResult out={result} /> : <>{initialLoading ? <>
+              <Grid container>
+
+                {Array.from({ length: 9 }).map((_, index) => (
+                  <Grid item xs={3} key={index} style={{ padding: "10px" }}>
+                    <div style={{ border: "solid 1px #80808029", padding: "10px" }}>
+                      <Skeleton variant="rectangular" height={150} />
+                      <Skeleton animation="wave" />
+                      <Skeleton animation={false} />
+                    </div>
+                  </Grid>
+                ))}
+              </Grid>
+
+
+            </> : <>
+              <Grid container>
+                {
+                  latestVideos?.map((item) => (
+                    <Grid item xs={3} key={item?.key}>
+                      <Card style={{ padding: "15px", height: "100%", position: "relative" }}>
+
+                        <video width="100%" controls style={{ borderRadius: '5px' }}>
+                          <source src={item?.url} type="video/mp4" />
+                        </video>
+                        <CardContent style={{ padding: "16px 16px 5px 16px" }}>
+                          <p style={{
+                            padding: "10px 0px 5px 0px", whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis"
+                          }} variant="body2" color="text.secondary">
+                            {extractName(item?.key)}
+
+                          </p>
+                          <hr />
+                          <p style={{ paddingTop: "10px" }}>
+                            Added On : {item?.last_modified}
+                          </p>
+                        </CardContent>
+
+
+                      </Card>
+
+                    </Grid>
+
+                  ))
+                }
+
+              </Grid>
+
+            </>}</>
         }
 
       </div>
